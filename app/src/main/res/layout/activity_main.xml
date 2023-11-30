@@ -127,7 +127,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/row2"
-        app:layout_constraintVertical_bias="0.085">
+        app:layout_constraintVertical_bias="0.146">
 
         <Button
             android:id="@+id/fourBtn"
@@ -180,7 +180,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/row3"
-        app:layout_constraintVertical_bias="0.085">
+        app:layout_constraintVertical_bias="0.241">
 
         <Button
             android:id="@+id/oneBtn"
@@ -233,7 +233,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/row4"
-        app:layout_constraintVertical_bias="0.085">
+        app:layout_constraintVertical_bias="0.733">
 
         <Button
             android:id="@+id/plusminusBtn"
@@ -275,7 +275,7 @@
     <TextView
         android:id="@+id/resultTextView"
         android:layout_width="0dp"
-        android:layout_height="244dp"
+        android:layout_height="225dp"
         android:layout_marginStart="-2dp"
         android:gravity="bottom|right"
         android:text="TextView"
