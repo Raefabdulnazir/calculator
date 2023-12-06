@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
     private lateinit var resultTextView: TextView
@@ -61,9 +62,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onEqualsButtonClick(view: View){
-        //need to implement the logic
-
-        updateResultTextView()
+        try{
+            val result = evaluateExpression(currentInput.toString())
+            currentInput.clear()
+            currentInput.append(result)
+            updateResultTextView()
+        }
+        catch (e:Exception){
+            currentInput.clear()
+            currentInput.append("Error")
+            updateResultTextView()
+        }
     }
 
     private fun onClearButtonClick(view: View){
@@ -79,5 +88,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateResultTextView(){
         resultTextView.text = currentInput.toString()
+    }
+
+    private fun evaluateExpression(expression: String):String{
+        val elements = expression.split(" ").filter { it.isNotBlank() }
+        val numbers = elements.filterIndexed{ index, _ -> index % 2 == 0  }.map{it.toDouble()}
+        val operators = elements.filterIndexed { index, _ -> index % 2 != 0 }
+
+        var result = numbers[0]
+        for (i in 1 until numbers.size){
+            when(operators[i-1]){
+                "+" -> result += numbers[i]
+                "-" -> result -= numbers[i]
+                "*" -> result *= numbers[i]
+                "/" -> result /= numbers[i]
+            }
+        }
+        return result.toString()
     }
 }

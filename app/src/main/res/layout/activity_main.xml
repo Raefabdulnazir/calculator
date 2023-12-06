@@ -278,7 +278,7 @@
         android:layout_height="225dp"
         android:layout_marginStart="-2dp"
         android:gravity="bottom|right"
-        android:text="TextView"
+        android:text=""
         android:textSize="42dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
