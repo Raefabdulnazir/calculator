@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setOperatorButtonClickListener(){
-        val operatorButtonsIds = listOf(R.id.plusBtn,R.id.subtractBtn,R.id.multiplyBtn,R.id.divisionBtn)
+        val operatorButtonsIds = listOf(R.id.plusBtn,R.id.subtractBtn,R.id.multiplyBtn,R.id.divisionBtn,R.id.percentageBtn)
         for (buttonId in operatorButtonsIds){
             findViewById<Button>(buttonId).setOnClickListener { onOperatorButtonClick(it) }
         }
@@ -91,17 +91,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun evaluateExpression(expression: String):String{
-        val elements = expression.split(" ").filter { it.isNotBlank() }
-        val numbers = elements.filterIndexed{ index, _ -> index % 2 == 0  }.map{it.toDouble()}
-        val operators = elements.filterIndexed { index, _ -> index % 2 != 0 }
+        val elements = expression.split(Regex("([^0-9.])"))
+        val numbers = elements.filter{ it.isNotBlank() && it!="."  }.map{it.toDouble()}
+        val operators = elements.filter{ it.isNotBlank() }
 
         var result = numbers[0]
         for (i in 1 until numbers.size){
             when(operators[i-1]){
                 "+" -> result += numbers[i]
                 "-" -> result -= numbers[i]
-                "*" -> result *= numbers[i]
-                "/" -> result /= numbers[i]
+                "×" -> result *= numbers[i]
+                "÷" -> result /= numbers[i]
+                "%" -> result %= numbers[i]
             }
         }
         return result.toString()
