@@ -93,9 +93,9 @@ class MainActivity : AppCompatActivity() {
     private fun evaluateExpression(expression: String):String{
         val elements = expression.split(Regex("([^0-9.])"))
         val numbers = elements.filter{ it.isNotBlank() && it!="."  }.map{it.toDouble()}
-        val operators = elements.filter{ it.isNotBlank() }
+        val operators = elements.filter{ it.isNotBlank() && it!="." && it.toDoubleOrNull() == null }
 
-        var result = numbers[0]
+        var result = /*if (expression.startsWith("-")) -numbers[0] else*/ numbers[0]
         for (i in 1 until numbers.size){
             when(operators[i-1]){
                 "+" -> result += numbers[i]
