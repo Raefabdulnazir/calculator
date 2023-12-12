@@ -1,5 +1,6 @@
 package com.example.calculator
 
+import android.os.Build.VERSION_CODES
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -10,6 +11,7 @@ import java.lang.Exception
 class MainActivity : AppCompatActivity() {
     private lateinit var resultTextView: TextView
     private var currentInput = StringBuilder()
+    //private val calculator = Calculator()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity() {
         setEqualtoButtonClickListener()
         setClearButtonClickListener()
         setPlusMinusButtonClickListener()
+        setDotBtnClickListener()
     }
 
     private fun setNumericButtonClickListener(){
@@ -49,6 +52,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.plusminusBtn).setOnClickListener { onPlusMinusButtonClick(it) }
     }
 
+    private fun setDotBtnClickListener(){
+        findViewById<Button>(R.id.dotBtn).setOnClickListener { onDotButton(it) }
+    }
     private  fun onNumericButtonClick(view: View) {
         val buttonText = (view as Button).text
         currentInput.append(buttonText)
@@ -86,15 +92,21 @@ class MainActivity : AppCompatActivity() {
         updateResultTextView()
     }
 
+    private fun onDotButton(view: View){
+        val buttontext = (view as Button).text
+        if(!currentInput.contains(".")){
+            currentInput.append("$buttontext")
+            updateResultTextView()
+        }
+    }
     private fun updateResultTextView(){
         resultTextView.text = currentInput.toString()
     }
 
     private fun evaluateExpression(expression: String):String{
-        val elements = expression.split(Regex("([^0-9.])"))
-        val numbers = elements.filter{ it.isNotBlank() && it!="."  }.map{it.toDouble()}
-        val operators = elements.filter{ it.isNotBlank() && it!="." && it.toDoubleOrNull() == null }
-
+        //val elements = expression.split(Regex("([^0-9.])"))
+        val numbers = expression.split(Regex("([^0-9.])")).filter { it.isNotBlank() && it!="." }.map { it.toDoubleOrNull() ?: throw IllegalArgumentException("Invalid number: $it")}
+        val operators = expression.split(Regex("([0-9.])")).filter { it.isNotBlank() }
         var result = /*if (expression.startsWith("-")) -numbers[0] else*/ numbers[0]
         for (i in 1 until numbers.size){
             when(operators[i-1]){
@@ -106,5 +118,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return result.toString()
+        currentInput.clear()
+        currentInput.append(result.toString())
     }
 }
