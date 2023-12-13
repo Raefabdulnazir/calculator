@@ -7,11 +7,12 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import java.lang.Exception
+import java.util.Stack
 
 class MainActivity : AppCompatActivity() {
     private lateinit var resultTextView: TextView
     private var currentInput = StringBuilder()
-    //private val calculator = Calculator()
+    private val calculator = Calculator()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -63,8 +64,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun onOperatorButtonClick(view: View){
         val buttonText = (view as Button).text
-        currentInput.append("$buttonText")
-        updateResultTextView()
+        /*val resultexp = resultTextView.text*/
+        /*val elements = resultexp.split(Regex("([^0-9.])"))*/
+        if (currentInput.isNotEmpty() && !isOperator(currentInput.last().toString())) {
+            println("Appending operator : $buttonText")
+            println("resulttxt : $currentInput")
+            currentInput.append("$buttonText")
+            updateResultTextView()  }
+        else{
+            println("not appending operator")
+        }
     }
 
     private fun onEqualsButtonClick(view: View){
@@ -96,12 +105,22 @@ class MainActivity : AppCompatActivity() {
         val buttontext = (view as Button).text
         val resultexp = resultTextView.text
         val elements = resultexp.split(Regex("([^0-9.])"))
-        for (i in 0 until elements.size){
-            if(!elements[i].contains(".")){
+
+/*      println("lastchar - $lastchar")
+        println("res - $resultexp")
+        println("elements - $elements")
+        println("last element - $lastelement")*/
+        if(currentInput.isNotEmpty()){
+            val lastelement = elements[elements.size - 1]//if resultexp is empty the app will shutdown
+            val lastchar = currentInput.last().toString()
+
+            if(!elements.isEmpty() && !lastelement.contains(".") && !isOperator(lastchar)){
+                /* println("last char of curentInput : $lastchar")*/
                 currentInput.append("$buttontext")
                 updateResultTextView()
             }
         }
+
     }
     private fun updateResultTextView(){
         resultTextView.text = currentInput.toString()
@@ -125,4 +144,56 @@ class MainActivity : AppCompatActivity() {
         currentInput.clear()
         currentInput.append(result.toString())
     }
+
+    private fun isOperator(s: String): Boolean{
+        return s in listOf("+","-","÷","×","%")
+    }
+}
+
+class Calculator{
+
+
+    fun evaluateExpression(expression:String): Double {
+        val postfixExpression = infixToPostfix(expression)
+        return evaluatePostfixxpression(postfixExpression)
+    }
+
+    private fun infixToPostfix(expression: String):String {
+        val result = StringBuilder()
+        val operatorStack = Stack<Char>()
+        for (char in expression) {
+            if (char.isDigit() || char == '.' ) {
+                result.append(char)
+            } else if (char.isOperator()) {
+                while (operatorStack.isNotEmpty() && char.precedence() <= operatorStack.peek().precedence()){
+                    result.append(" ").append(operatorStack.pop()).append(" ")
+                }
+                operatorStack.push(char)
+            }  else if(char == '('){
+                operatorStack.push(char)
+            }  else if(char == ')'){
+                while(operatorStack.isNotEmpty() && operatorStack.peek() != ')'){
+                    result.append(" ").append(operatorStack.pop()).append(" ")
+                }
+                operatorStack.pop()//this is to pop (
+            }
+        }
+        while (operatorStack.isNotEmpty()){
+            result.append(" ").append(operatorStack.pop()).append(" ")
+        }
+        return result.toString().trim()//why is this trim is used
+    }
+
+    private fun Char.isOperator(): Boolean {
+        return this in setOf('+', '-', '×', '÷', '%')
+    }
+
+    private fun Char.precedence(): Int {
+        return when(this){
+            '+','-' -> 1
+            '×','÷','%' -> 2
+            else -> 0
+        }
+    }
+
 }
