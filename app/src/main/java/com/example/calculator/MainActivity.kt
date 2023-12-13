@@ -94,9 +94,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun onDotButton(view: View){
         val buttontext = (view as Button).text
-        if(!currentInput.contains(".")){
-            currentInput.append("$buttontext")
-            updateResultTextView()
+        val resultexp = resultTextView.text
+        val elements = resultexp.split(Regex("([^0-9.])"))
+        for (i in 0 until elements.size){
+            if(!elements[i].contains(".")){
+                currentInput.append("$buttontext")
+                updateResultTextView()
+            }
         }
     }
     private fun updateResultTextView(){
