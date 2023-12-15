@@ -69,8 +69,8 @@ class MainActivity : AppCompatActivity() {
         /*val elements = resultexp.split(Regex("([^0-9.])"))*/
         if (currentInput.isNotEmpty() && !isOperator(currentInput.last().toString())) {
             println("Appending operator : $buttonText")
-            println("resulttxt : $currentInput")
             currentInput.append("$buttonText")
+            println("resulttxt : $currentInput")
             updateResultTextView()  }
         else{
             println("not appending operator")
@@ -83,11 +83,12 @@ class MainActivity : AppCompatActivity() {
             /*val result = evaluateExpression(currentInput.toString())*/
             currentInput.clear()
             currentInput.append(result)
+            println("The infix expression : $result")
             updateResultTextView()
         }
         catch (e:Exception){
             currentInput.clear()
-            currentInput.append("Error")
+            currentInput.append("Error in onEquals..()")
             updateResultTextView()
         }
     }
@@ -127,12 +128,15 @@ class MainActivity : AppCompatActivity() {
     private fun updateResultTextView(){
         resultTextView.text = currentInput.toString()
     }
-
+//not calling this function. this is for the calculator without bodmass
+/*
     private fun evaluateExpression(expression: String):Double{
         //val elements = expression.split(Regex("([^0-9.])"))
         val numbers = expression.split(Regex("([^0-9.])")).filter { it.isNotBlank() && it!="." }.map { it.toDoubleOrNull() ?: throw IllegalArgumentException("Invalid number: $it")}
-        val operators = expression.split(Regex("([0-9.])")).filter { it.isNotBlank() }
-        var result = /*if (expression.startsWith("-")) -numbers[0] else*/ numbers[0]
+        val operators = expression.split(Regex("([^0-9.])")).filter { it.isNotBlank() }
+        var result = */
+/*if (expression.startsWith("-")) -numbers[0] else*//*
+ numbers[0]
         for (i in 1 until numbers.size){
             when(operators[i-1]){
                 "+" -> result += numbers[i]
@@ -146,6 +150,7 @@ class MainActivity : AppCompatActivity() {
         currentInput.clear()
         currentInput.append(result.toString())
     }
+*/
 
     private fun isOperator(s: String): Boolean{
         return s in listOf("+","-","÷","×","%")
@@ -162,52 +167,66 @@ class Calculator{
 
     private fun infixToPostfix(expression: String):String {
         val result = StringBuilder()
+        var poppedOperator: Char? =null
         val operatorStack = Stack<Char>()
         for (char in expression) {
             if (char.isNumeric() || char == '.' ) {
                 result.append(char)
-                result.append(" ")//new change
+                result.append(" ")
+                println("Appended $char in postfix expression")
+                println("The postfix expression : $result")
             } else if (char.isOperator()) {
                 while (operatorStack.isNotEmpty() && char.precedence() <= operatorStack.peek().precedence()){
-                    result.append(" ").append(operatorStack.pop()).append(" ")
+                    poppedOperator = operatorStack.pop()
+                    result.append(" ").append(poppedOperator).append(" ")
+                    println("Appended $poppedOperator in postfix expression")
+                    println("The postfix expression : $result")
                 }
                 operatorStack.push(char)
             }  else if(char == '('){
                 operatorStack.push(char)
             }  else if(char == ')'){
                 while(operatorStack.isNotEmpty() && operatorStack.peek() != ')'){
-                    result.append(" ").append(operatorStack.pop()).append(" ")
+                    poppedOperator = operatorStack.pop()
+                    result.append(" ").append(poppedOperator).append(" ")
+                    println("Appending $poppedOperator in postfix expression")
                 }
                 operatorStack.pop()//this is to pop (
             }
         }
         while (operatorStack.isNotEmpty()){
-            result.append(" ").append(operatorStack.pop()).append(" ")
+            poppedOperator = operatorStack.pop()
+            result.append(" ").append(poppedOperator).append(" ")
+            println("Appending $poppedOperator in postfix expression")
         }
         println("Result = $result")//to check
-        return result.toString().trim()//why is this trim is used
+        return result.toString().trim()///why is this trim is used - to delete leading and trailing spaces
+
     }
 
     private fun evaluatePostfixxpression(postfixExpression: String): Double{
         val stack = Stack<Double>()
+        val splitpostfixExpression = postfixExpression.split("\\s+".toRegex())
+        for(element in splitpostfixExpression){
+            println("splitting the postfixexp at : $element")
+            if(element.isNumeric()){
+                stack.push(element.toDouble())
+                println("$element has been pushed to the stack")
 
-        for(char in postfixExpression.split("\\s+".toRegex())){
-            println("splitting the postfixexp at : $char")
-            if(char.isDigitsOnly()){
-                stack.push(char.toDouble())
+            }//not going inside this loop
+            else if(element.isOperator()){
+                println("$element has been pushed to the stack")
 
-            }
-            else if(char.isOperator()){
                 val operand2 = stack.pop()
                 val operand1 = stack.pop()
                 println("the popped operands are : $operand1,$operand2")
-                val result = when (char){
-                    "+" -> operand1+operand2
-                    "-" -> operand1-operand2
-                    "%" -> operand1%operand2
-                    "×" -> operand1*operand2
-                    "÷" -> operand1/operand2
-                    else -> throw IllegalArgumentException("Invalid operator : $char")
+                val result = when (element){
+                    "+" -> operand1 + operand2
+                    "-" -> operand1 - operand2
+                    "%" -> operand1 % operand2
+                    "×" -> operand1 * operand2
+                    "÷" -> operand1 / operand2
+                    else -> throw IllegalArgumentException("Invalid operator : $element")
                 }
                 println("posfix operands result = $result")
                 stack.push(result)
